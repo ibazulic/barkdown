@@ -1,0 +1,44 @@
+[
+    {
+        "project": "cmark",
+        "format": "C",
+        "license": "BSD 2-Clause",
+        "url": "https://github.com/commonmark/cmark"
+    },
+    {
+        "project": "SDL2",
+        "format": "C",
+        "license": "Zlib",
+        "url": "https://github.com/libsdl-org/SDL"
+    },
+    {
+        "project": "Dear ImGui",
+        "format": "C++",
+        "license": "MIT",
+        "url": "https://github.com/ocornut/imgui"
+    },
+    {
+        "project": "libcurl",
+        "format": "C",
+        "license": "curl (MIT-style)",
+        "url": "https://github.com/curl/curl"
+    },
+    {
+        "project": "stb_image",
+        "format": "C",
+        "license": "MIT / Public Domain",
+        "url": "https://github.com/nothings/stb"
+    },
+    {
+        "project": "portable-file-dialogs",
+        "format": "C++",
+        "license": "WTFPL",
+        "url": "https://github.com/samhocevar/portable-file-dialogs"
+    },
+    {
+        "project": "GoogleTest",
+        "format": "C++",
+        "license": "BSD 3-Clause",
+        "url": "https://github.com/google/googletest"
+    }
+]
