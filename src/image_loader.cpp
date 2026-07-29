@@ -358,7 +358,7 @@ void image_loader::set_path(const std::string &document_path) {
     {
         std::unique_lock<std::mutex> lock(mutex_);
         std::filesystem::path p(document_path);
-        base_path = p.parent_path();
+        base_path = std::filesystem::absolute(p).parent_path();
     }
 
     invalidate_cache();

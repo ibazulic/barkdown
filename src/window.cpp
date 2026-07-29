@@ -68,9 +68,6 @@ enum errorcodes main_window(const char *window_title, int height, int width,
     // initialize global curl context
     global_curl_context context;
 
-    // initialize image loader
-    image_loader loader(filename);
-
     // default font scale
     float font_scale = 2.0f;
 
@@ -115,6 +112,9 @@ enum errorcodes main_window(const char *window_title, int height, int width,
         SDL_Quit();
         return GL_CONTEXT_CREATE_FAILED;
     }
+
+    // initialize image loader
+    image_loader loader(filename);
 
     // get actual window size
     int actual_width, actual_height;

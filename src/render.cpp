@@ -341,13 +341,12 @@ void render_document(const std::vector<markdown_node> &parsed,
                 cursor_y += 2 * base_font_size;
 
                 float scale = 1.0f;
-                float available_width = wrap_width - (cursor_x - start_pos.x);
 
-                cursor_x = 0.0f + padding;
+                cursor_x = start_pos.x + padding;
+                float available_width = wrap_width - (cursor_x - start_pos.x);
 
                 if (image->width > available_width) {
                     scale = available_width / image->width;
-                    cursor_x = line_start_x + line_start_x * scale;
                 }
                 float draw_width = image->width * scale;
                 float draw_height = image->height * scale;

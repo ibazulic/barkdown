@@ -129,4 +129,9 @@ class global_curl_context {
     public:
         global_curl_context() { curl_global_init(CURL_GLOBAL_DEFAULT); }
         ~global_curl_context() { curl_global_cleanup(); }
+
+        // explicitly forbid copying of context, only one global CURL context
+        // can exist
+        global_curl_context(const global_curl_context&) = delete;
+        global_curl_context& operator=(const global_curl_context&) = delete;
 };
