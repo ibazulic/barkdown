@@ -53,9 +53,6 @@ image_loader::image_loader(const std::string &document_path) : stop_(false) {
 
     std::cerr << "Base path set to: " << base_path << "\n";
 
-    // initialize global curl context
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-
     for (int i = 0; i < 4; i++) {
         workers_[i] = std::thread([this] { fetch_worker(); });
         std::cerr << "Initalized worker thread " << i << "\n";
@@ -80,8 +77,6 @@ image_loader::~image_loader() {
     // clean up all resources
     clear_resources();
 
-    // close the global curl context
-    curl_global_cleanup();
 }
 
 // get_proxy checks if there are any proxy variables based on prefix so we can
