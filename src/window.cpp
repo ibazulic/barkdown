@@ -23,6 +23,7 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include "markdown.hpp"
 #include "portable-file-dialogs.h"
 #include "render.hpp"
+#include "image_loader.hpp"
 #include <GL/gl.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
@@ -41,7 +42,7 @@ namespace fs = std::filesystem;
 // create_window creates the window with provided height, width and title on a
 // primary display.
 enum errorcodes main_window(const char *window_title, int height, int width,
-                            std::string filename, image_loader &loader) {
+                            std::string filename) {
     // display window position and size
     int display_index = 0;
     int screen_width, screen_height, window_pos_x, window_pos_y;
@@ -63,6 +64,12 @@ enum errorcodes main_window(const char *window_title, int height, int width,
     std::vector<markdown_node> parsed;
 
     bool is_running = true;
+
+    // initialize global curl context
+    global_curl_context context;
+
+    // initialize image loader
+    image_loader loader(filename);
 
     // default font scale
     float font_scale = 2.0f;

@@ -338,12 +338,12 @@ void render_document(const std::vector<markdown_node> &parsed,
             if (image.has_value() && (image->state == UPLOADED)) {
                 // move two lines down and position to the the 1/3 of the render
                 // area from the left side
-                // cursor_y += 2 * base_font_size;
+                cursor_y += 2 * base_font_size;
 
                 float scale = 1.0f;
                 float available_width = wrap_width - (cursor_x - start_pos.x);
 
-                cursor_x = line_start_x + padding;
+                cursor_x = 0.0f + padding;
 
                 if (image->width > available_width) {
                     scale = available_width / image->width;

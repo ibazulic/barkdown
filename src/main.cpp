@@ -38,13 +38,11 @@ int main(int argc, char *argv[]) {
     if (argc == 2) {
         // intepret the 2nd provided parameter as a file name.
         filename = argv[1];
+        std::cerr << "File to load: " << filename << ".\n";
     }
 
-    // initialize the image loader class
-    image_loader loader(filename);
-
     enum errorcodes state =
-        main_window("Barkdown Renderer", 720, 1280, filename, loader);
+        main_window("Barkdown Renderer", 720, 1280, filename);
     switch (state) {
     case SUCCESSFUL_EXIT:
         return 0;

@@ -30,7 +30,9 @@ image_loader::image_loader(const std::string &document_path) : stop_(false) {
     // set up document base path
     if (!document_path.empty()) {
         std::filesystem::path p(document_path);
-        base_path = p.parent_path();
+
+        // need to convert to absolute path
+        base_path = std::filesystem::absolute(p).parent_path();
     } else {
 // set the base path to the home directory of the current user
 #if defined(_WIN32)
@@ -40,15 +42,19 @@ image_loader::image_loader(const std::string &document_path) : stop_(false) {
             base_path = p;
         }
 #else
-        const char *home = std::getenv("HOME");
-        if (home) {
-            std::filesystem::path p(home);
+        // set path to current working directory
+        const char *pwd = std::getenv("PWD");
+        if (pwd) {
+            std::filesystem::path p(pwd);
             base_path = p;
-        }
+        } 
 #endif
     }
 
     std::cerr << "Base path set to: " << base_path << "\n";
+
+    // initialize global curl context
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 
     for (int i = 0; i < 4; i++) {
         workers_[i] = std::thread([this] { fetch_worker(); });
@@ -73,6 +79,9 @@ image_loader::~image_loader() {
 
     // clean up all resources
     clear_resources();
+
+    // close the global curl context
+    curl_global_cleanup();
 }
 
 // get_proxy checks if there are any proxy variables based on prefix so we can

@@ -26,6 +26,7 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <curl/curl.h>
 
 // image_state is an enum containing the current state of the image.
 enum image_state {
@@ -121,3 +122,11 @@ std::string get_proxy(std::string prefix);
 // get_full_url returns the full url to the object including its prefix
 std::string get_full_url(const std::filesystem::path base_path,
                          const std::string &url);
+
+// global_curl_context class is a wrapper around global curl initialization context that needs to run once. Since
+// we're using threaded operations to download images, it has to be initialized before any threading operations commence.
+class global_curl_context {
+    public:
+        global_curl_context() { curl_global_init(CURL_GLOBAL_DEFAULT); }
+        ~global_curl_context() { curl_global_cleanup(); }
+};

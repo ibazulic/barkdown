@@ -20,27 +20,28 @@ Capabilities:
    ~~~
 
 2. Install dependencies:
-  - for RHEL/Fedora based distributions:
+
+   - for RHEL/Fedora based distributions:
     
-    ~~~
-    $ sudo dnf install SDL2-devel libcurl-devel cmark-devel stb_image-devel mesa-libGL cmake
-    $ sudo dnf group install c-development
-    ~~~
+     ~~~
+     $ sudo dnf install SDL2-devel libcurl-devel cmark-devel stb_image-devel mesa-libGL cmake
+     $ sudo dnf group install c-development
+     ~~~
     
-  - for Debian based distributions:
+   - for Debian based distributions:
         
-    ~~~
-    $ sudo apt-get install libsdl2-dev libcurl4-openssl-dev libcmark0.30.2 libcmark-dev libgl1-mesa-dev cmark libstb-dev build-essential cmake 
-    ~~~
+     ~~~
+     $ sudo apt-get install libsdl2-dev libcurl4-openssl-dev libcmark0.30.2 libcmark-dev libgl1-mesa-dev cmark libstb-dev build-essential cmake 
+     ~~~
 
 3. Building cannot be done from the source dir, I'd just recommend creating `build` directory inside:
 
-  ~~~
-  $ cd barkdown && mkdir build && cd build
-  $ cmake ..
-  $ make
-  $ make install
-  ~~~
+   ~~~
+   $ cd barkdown && mkdir build && cd build
+   $ cmake ..
+   $ make
+   $ make install
+   ~~~
 
 The binary should land in your `/usr/local/bin` directory.
 

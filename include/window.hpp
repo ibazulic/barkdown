@@ -38,7 +38,7 @@ enum icon {
 // main_window creates an SDL window with the provided title and size. Pass the
 // filename of the file for rendering if provided.
 enum errorcodes main_window(const char *window_title, int height, int width,
-                            std::string filename, image_loader &loader);
+                            std::string filename);
 
 // create_ok_modal_dialog creates a modal dialog with the OK button. Consumes
 // the icon information and text to render.
