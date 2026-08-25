@@ -28,7 +28,8 @@ jobs:
           libcurl4-openssl-dev \
           libcmark-dev \
           libgl1-mesa-dev \
-          libstb-dev
+          libstb-dev \
+          cmark
     - name: Configure CMake
       run: |
         mkdir -p build
@@ -62,6 +63,9 @@ jobs:
     container:
       image: fedora:latest
     steps:
+    - name: Install git
+      run: |
+        dnf install -y git
     - name: Checkout code
       uses: actions/checkout@v4
       with:
@@ -77,6 +81,7 @@ jobs:
           libcurl-devel \
           cmark-devel \
           mesa-libGL-devel \
+          cmark \
           stb_image-devel
     - name: Configure CMake
       run: |
