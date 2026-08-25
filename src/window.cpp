@@ -87,6 +87,9 @@ enum errorcodes main_window(const char *window_title, int height, int width,
         return DETERMINE_WINDOW_SIZE_FAILED;
     }
 
+    // Set scaling hint for SDL2 window
+    SDL_SetHint(SDL_HINT_WINDOWS_DPI_SCALING, "1");
+
     // create a window
     // we'll choose some "happy" coordinates, 1/4 from the left side, 1/3 from
     // the top
