@@ -33,8 +33,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+# for MacOS builds we need to add specific directories to search through
+if(APPLE)
+    list(APPEND CMAKE_PREFIX_PATH /opt/homebrew /opt/local)
+endif()
+
 # find cmark library
-find_package(cmark REQUIRED)
+# find_package(cmark REQUIRED)
+
+# tell pkg-config where Homebrew and MacPorts put their .pc files
+if(APPLE)
+    set(ENV{PKG_CONFIG_PATH} "/opt/homebrew/lib/pkgconfig:/opt/local/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+endif()
+
+# find cmark via pkg-config (Homebrew/MacPorts don't ship a CMake config)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CMARK REQUIRED IMPORTED_TARGET libcmark)
 
 # find SDL library
 find_package(SDL2 REQUIRED)
@@ -72,6 +86,7 @@ target_sources(barkdown
         src/window.cpp
         src/file_operations.cpp
         src/image_loader.cpp
+        src/verbosity.cpp
         third_party/imgui/backends/imgui_impl_opengl3.cpp
         third_party/imgui/backends/imgui_impl_sdl2.cpp
         third_party/imgui/imgui.cpp
@@ -82,7 +97,7 @@ target_sources(barkdown
 )
 target_link_libraries(barkdown
     PRIVATE
-        cmark
+        PkgConfig::CMARK
         OpenGL::GL
         Threads::Threads
         CURL::libcurl
@@ -95,21 +110,37 @@ target_sources(barkdown-test
         tests/test_parser.cpp
         tests/test_path_parsing.cpp
         src/image_loader.cpp
+        src/verbosity.cpp
 )
 target_link_libraries(barkdown-test
     PRIVATE
         gtest_main
-        cmark
+        PkgConfig::CMARK
         Threads::Threads
         CURL::libcurl
         OpenGL::GL
 )
+
+# suppress warnings for OpenGL if compiled on MacOS
+if(APPLE)
+    target_compile_definitions(barkdown PRIVATE GL_SILENCE_DEPRECATION)
+endif()
+
+# find the stb_image.h automatically
+find_path(STB_INCLUDE_DIR stb/stb_image.h
+    HINTS /opt/local/include /usr/local/include /opt/homebrew/include
+)
+if(NOT STB_INCLUDE_DIR)
+    message(FATAL_ERROR "stb_image.h not found")
+endif()
 
 # include directories
 target_include_directories(barkdown
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
+        ${STB_INCLUDE_DIR}
+        ${CMARK_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui/backends
@@ -121,7 +152,9 @@ target_include_directories(barkdown-test
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
+        ${CMARK_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${STB_INCLUDE_DIR}
 
 )
 

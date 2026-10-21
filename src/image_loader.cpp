@@ -21,12 +21,16 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <functional>
 #include <iostream>
 #include <string>
+#include "verbosity.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 // image_loader constructor creates the thread pool on class instantiation.
 image_loader::image_loader(const std::string &document_path) : stop_(false) {
-    std::cerr << "Initializing worker pool and setting base path\n";
+    if (barkdown_verbose) {
+        std::cerr << "Initializing worker pool and setting base path\n";
+    }
+    
     // set up document base path
     if (!document_path.empty()) {
         std::filesystem::path p(document_path);
@@ -51,11 +55,15 @@ image_loader::image_loader(const std::string &document_path) : stop_(false) {
 #endif
     }
 
-    std::cerr << "Base path set to: " << base_path << "\n";
+    if (barkdown_verbose) {
+        std::cerr << "Base path set to: " << base_path << "\n";
+    }
 
     for (int i = 0; i < 4; i++) {
         workers_[i] = std::thread([this] { fetch_worker(); });
-        std::cerr << "Initalized worker thread " << i << "\n";
+        if (barkdown_verbose) {
+            std::cerr << "Initalized worker thread " << i << "\n";
+        }
     }
 }
 
@@ -143,7 +151,9 @@ void image_loader::request_image(const std::string &url) {
 
         if (state == NOT_FOUND) {
             image_loader::insert_entry(full_url);
-            std::cerr << "Requesting image with url " << full_url << "\n";
+            if (barkdown_verbose) {
+                std::cerr << "Requesting image with url " << full_url << "\n";
+            }
             work_queue_.push(full_url);
         }
     }
@@ -193,7 +203,7 @@ void image_loader::fetch_worker() {
             }
 
             // get the next download url from the queue
-            url = move(work_queue_.front());
+            url = std::move(work_queue_.front());
             work_queue_.pop();
         }
 
@@ -341,11 +351,13 @@ void image_loader::process_uploads() {
             cache_[url].height = height;
             cache_[url].width = width;
             cache_[url].texture_id = texture_id;
-            std::cerr << "Image with source url " << url
+            if (barkdown_verbose) {
+                std::cerr << "Image with source url " << url
                       << " processed, height: " << cache_[url].height
                       << ", width: " << cache_[url].width
                       << ", size: " << raw.size()
                       << ", state: " << cache_[url].state << "\n";
+            }            
         }
 
         // free buffer
