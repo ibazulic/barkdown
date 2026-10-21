@@ -24,7 +24,11 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include "portable-file-dialogs.h"
 #include "render.hpp"
 #include "image_loader.hpp"
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <filesystem>
@@ -89,6 +93,13 @@ enum errorcodes main_window(const char *window_title, int height, int width,
 
     // Set scaling hint for SDL2 window
     SDL_SetHint(SDL_HINT_WINDOWS_DPI_SCALING, "1");
+
+    // set GL attributes so that MacOS is happy
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
 
     // create a window
     // we'll choose some "happy" coordinates, 1/4 from the left side, 1/3 from

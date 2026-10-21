@@ -16,7 +16,11 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #pragma once
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 #include <condition_variable>
 #include <filesystem>
 #include <mutex>

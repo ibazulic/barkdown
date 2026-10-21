@@ -22,6 +22,7 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "verbosity.hpp"
 
 // is_block_node returns true if the node we're in is a block node.
 bool is_block_node(cmark_node_type type) {
@@ -360,11 +361,13 @@ std::vector<markdown_node> parse_document(const char *readBuffer,
         cmark_node_free(root_node);
     }
 
-     for (unsigned long int i = 0; i < parsed_document.size(); i++) {
+    if (barkdown_verbose) {
+        for (unsigned long int i = 0; i < parsed_document.size(); i++) {
             printf("%lu: type=%d depth=%d new_line=%d bold=%d text='%s' url='%s'\n", 
                 i, parsed_document[i].type, parsed_document[i].depth, parsed_document[i].starts_new_line, 
                 parsed_document[i].is_bold, parsed_document[i].textblock.c_str(), parsed_document[i].url.c_str());
         }
+    }
 
     return parsed_document;
 }
