@@ -43,10 +43,64 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace fs = std::filesystem;
 
+// load_and_parse loads the provided file and parses its content. Raises a
+// dialog screen error if loading fails.
+void load_and_parse(const std::string &filepath, std::string &input_buffer,
+                    std::vector<markdown_node> &parsed,
+                    MessageDialog &msg_dialog, image_loader &loader) {
+    file_errors return_value = read_file(filepath, input_buffer);
+    fs::path absolute_path = fs::absolute(filepath);
+    std::string msg;
+
+    switch (return_value) {
+        case FILE_NOT_FOUND:
+            {
+                msg = "Error opening: file not found. Path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("File not found", msg, DIALOG_INFORMATION);
+                break;
+            }
+        case FILE_READING_FAILED:
+            {
+                msg = "Error opening: error reading file on path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("Error opening file", msg, DIALOG_ERROR);
+                break;
+            }
+        case FILE_EMPTY:
+            {
+                msg =
+                    "Empty file provided on path: \n" + absolute_path.string();
+                msg_dialog.show("Empty file provided", msg, DIALOG_WARNING);
+                break;
+            }
+        case FILE_WRONG_EXTENSION:
+            {
+                msg = "Error opening file: wrong extension of provided file on "
+                      "path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("Wrong extension provided", msg,
+                                DIALOG_WARNING);
+                break;
+            }
+        case FILE_READ_SUCCESSFUL:
+            parsed = parse_document(input_buffer.c_str(), input_buffer.size());
+            if (parsed.empty()) {
+                msg = "Encountered an error during parsing of the MarkDown "
+                      "document";
+                msg_dialog.show("Error parsing file", msg, DIALOG_ERROR);
+            }
+            loader.set_path(absolute_path);
+            break;
+        default:
+            break;
+    }
+}
+
 // create_window creates the window with provided height, width and title on a
 // primary display.
-enum errorcodes main_window(const char *window_title, int height, int width,
-                            std::string filename) {
+errorcodes main_window(const char *window_title, int height, int width,
+                       std::string filename) {
     // display window position and size
     int display_index = 0;
     int screen_width, screen_height, window_pos_x, window_pos_y;
@@ -55,7 +109,6 @@ enum errorcodes main_window(const char *window_title, int height, int width,
     std::string input_buffer;
     std::string msg;
 
-    file_errors return_value;
     fs::path absolute_path;
 
     // set SDL window parameters
@@ -184,44 +237,7 @@ enum errorcodes main_window(const char *window_title, int height, int width,
 
     if (!filename.empty()) {
         // try reading the provided file from the commmand line
-        return_value = read_file(filename, input_buffer);
-        absolute_path = fs::absolute(filename);
-        switch (return_value) {
-        case FILE_NOT_FOUND: {
-            msg = "Error opening: file not found. Path: \n" +
-                  absolute_path.string();
-            msg_dialog.show("File not found", msg, DIALOG_INFORMATION);
-            break;
-        }
-        case FILE_READING_FAILED: {
-            msg = "Error opening: error reading file on path: \n" +
-                  absolute_path.string();
-            msg_dialog.show("Error opening file", msg, DIALOG_ERROR);
-            break;
-        }
-        case FILE_EMPTY: {
-            msg = "Empty file provided on path: \n" + absolute_path.string();
-            msg_dialog.show("Empty file provided", msg, DIALOG_WARNING);
-            break;
-        }
-        case FILE_WRONG_EXTENSION: {
-            msg = "Error opening file: wrong extension of provided file on "
-                  "path: \n" +
-                  absolute_path.string();
-            msg_dialog.show("Wrong extension provided", msg, DIALOG_WARNING);
-            break;
-        }
-        case FILE_READ_SUCCESSFUL:
-            parsed = parse_document(input_buffer.c_str(), input_buffer.size());
-            if (parsed.empty()) {
-                msg = "Encountered an error during parsing of the MarkDown "
-                      "document";
-                msg_dialog.show("Error parsing file", msg, DIALOG_ERROR);
-            }
-            break;
-        default:
-            break;
-        }
+        load_and_parse(filename, input_buffer, parsed, msg_dialog, loader);
     }
 
     // Main loop
@@ -298,49 +314,7 @@ enum errorcodes main_window(const char *window_title, int height, int width,
 
         ImGui::EndChild();
         if (file_dialog.render(out_path)) {
-            return_value = read_file(out_path, input_buffer);
-            absolute_path = fs::absolute(out_path);
-
-            switch (return_value) {
-            case FILE_NOT_FOUND: {
-                msg = "Error opening: file not found. Path: \n" +
-                      absolute_path.string();
-                msg_dialog.show("File not found", msg, DIALOG_INFORMATION);
-                break;
-            }
-            case FILE_READING_FAILED: {
-                msg = "Error opening: error reading file on path: \n" +
-                      absolute_path.string();
-                msg_dialog.show("Error opening file", msg, DIALOG_ERROR);
-                break;
-            }
-            case FILE_EMPTY: {
-                msg =
-                    "Empty file provided on path: \n" + absolute_path.string();
-                msg_dialog.show("Empty file provided", msg, DIALOG_WARNING);
-                break;
-            }
-            case FILE_WRONG_EXTENSION: {
-                msg = "Error opening file: wrong extension of provided "
-                      "file on path: \n" +
-                      absolute_path.string();
-                msg_dialog.show("Wrong extension provided", msg,
-                                DIALOG_WARNING);
-                break;
-            }
-            case FILE_READ_SUCCESSFUL:
-                parsed =
-                    parse_document(input_buffer.c_str(), input_buffer.size());
-                loader.set_path(absolute_path);
-                if (parsed.empty()) {
-                    msg = "Encountered an error during parsing of the "
-                          "MarkDown document";
-                    msg_dialog.show("Error parsing file", msg, DIALOG_ERROR);
-                }
-                break;
-            default:
-                break;
-            }
+            load_and_parse(out_path, input_buffer, parsed, msg_dialog, loader);
         }
         msg_dialog.render();
         ImGui::End();

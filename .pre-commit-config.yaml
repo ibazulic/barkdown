@@ -5,3 +5,11 @@ repos:
       - id: clang-format
         files: ^(src|include|tests)
         exclude: ^include/DejaVu
+  - repo: local
+    hooks:
+      - id: git-diff
+        name: show diff
+        entry: git diff --exit-code
+        language: system
+        pass_filenames: false
+        always_run: true
