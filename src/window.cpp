@@ -16,14 +16,14 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "window.hpp"
+#include "dialogs.hpp"
 #include "file_operations.hpp"
+#include "image_loader.hpp"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "markdown.hpp"
-#include "dialogs.hpp"
 #include "render.hpp"
-#include "image_loader.hpp"
 #if defined(__APPLE__)
 #include <OpenGL/gl.h>
 #else
@@ -103,10 +103,10 @@ enum errorcodes main_window(const char *window_title, int height, int width,
 
     // set GL attributes so that MacOS is happy
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
 
     // create a window
     // we'll choose some "happy" coordinates, 1/4 from the left side, 1/3 from
@@ -179,7 +179,7 @@ enum errorcodes main_window(const char *window_title, int height, int width,
     bool dark_theme = true;
     ImGui::StyleColorsDark();
     ImGuiStyle &style = ImGui::GetStyle();
-    
+
     style.Colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
 
     if (!filename.empty()) {
@@ -280,7 +280,8 @@ enum errorcodes main_window(const char *window_title, int height, int width,
                 ImGui::StyleColorsDark();
                 ImGuiStyle &style = ImGui::GetStyle();
 
-                style.Colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+                style.Colors[ImGuiCol_WindowBg] =
+                    ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
                 dark_theme = true;
             }
         }
@@ -314,8 +315,8 @@ enum errorcodes main_window(const char *window_title, int height, int width,
                 break;
             }
             case FILE_EMPTY: {
-                msg = "Empty file provided on path: \n" +
-                      absolute_path.string();
+                msg =
+                    "Empty file provided on path: \n" + absolute_path.string();
                 msg_dialog.show("Empty file provided", msg, DIALOG_WARNING);
                 break;
             }
@@ -328,8 +329,8 @@ enum errorcodes main_window(const char *window_title, int height, int width,
                 break;
             }
             case FILE_READ_SUCCESSFUL:
-                parsed = parse_document(input_buffer.c_str(),
-                                        input_buffer.size());
+                parsed =
+                    parse_document(input_buffer.c_str(), input_buffer.size());
                 loader.set_path(absolute_path);
                 if (parsed.empty()) {
                     msg = "Encountered an error during parsing of the "

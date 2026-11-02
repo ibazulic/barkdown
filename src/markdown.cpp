@@ -16,13 +16,13 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "markdown.hpp"
+#include "verbosity.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cmark.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "verbosity.hpp"
 
 // is_block_node returns true if the node we're in is a block node.
 bool is_block_node(cmark_node_type type) {
@@ -189,7 +189,7 @@ std::vector<markdown_node> parse_document(const char *readBuffer,
                     } else {
                         current_data.type = LIST_ITEM_UNORDERED;
                     }
-                    
+
                     current_data.is_inline = true;
                     current_data.depth = depth.back();
                     current_data.starts_new_line = start_new_line;
@@ -208,7 +208,7 @@ std::vector<markdown_node> parse_document(const char *readBuffer,
                     if (is_inside_image) {
                         continue;
                     }
-                    
+
                     const char *cur_node_value =
                         cmark_node_get_literal(cur_node);
 
@@ -363,9 +363,13 @@ std::vector<markdown_node> parse_document(const char *readBuffer,
 
     if (barkdown_verbose) {
         for (unsigned long int i = 0; i < parsed_document.size(); i++) {
-            printf("%lu: type=%d depth=%d new_line=%d bold=%d text='%s' url='%s'\n", 
-                i, parsed_document[i].type, parsed_document[i].depth, parsed_document[i].starts_new_line, 
-                parsed_document[i].is_bold, parsed_document[i].textblock.c_str(), parsed_document[i].url.c_str());
+            printf("%lu: type=%d depth=%d new_line=%d bold=%d text='%s' "
+                   "url='%s'\n",
+                   i, parsed_document[i].type, parsed_document[i].depth,
+                   parsed_document[i].starts_new_line,
+                   parsed_document[i].is_bold,
+                   parsed_document[i].textblock.c_str(),
+                   parsed_document[i].url.c_str());
         }
     }
 

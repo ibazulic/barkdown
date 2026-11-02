@@ -15,49 +15,48 @@ You should have received a copy of the GNU General Public License
 along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
 #include "image_loader.hpp"
+#include <gtest/gtest.h>
 
-TEST(URLResolverTest, Handle_Remote_URLs)   {
+TEST(URLResolverTest, Handle_Remote_URLs) {
     std::filesystem::path fake_base = "/home/user";
-    EXPECT_EQ(get_full_url(fake_base, "https://wikipedia.org/image.png"), 
-        "https://wikipedia.org/image.png");
+    EXPECT_EQ(get_full_url(fake_base, "https://wikipedia.org/image.png"),
+              "https://wikipedia.org/image.png");
 
-    EXPECT_EQ(get_full_url(fake_base, "http://fake.url/images/tech.jpg"), 
-        "http://fake.url/images/tech.jpg");
+    EXPECT_EQ(get_full_url(fake_base, "http://fake.url/images/tech.jpg"),
+              "http://fake.url/images/tech.jpg");
 }
 
-TEST(URLResolverTest, Handle_Explicit_File_URLs)    {
+TEST(URLResolverTest, Handle_Explicit_File_URLs) {
     std::filesystem::path fake_base = "/var/www";
-    EXPECT_EQ(get_full_url(fake_base, "file:///var/www/images/foo.jpg"), 
-        "file:///var/www/images/foo.jpg");
+    EXPECT_EQ(get_full_url(fake_base, "file:///var/www/images/foo.jpg"),
+              "file:///var/www/images/foo.jpg");
 }
 
-TEST(URLResolverTest, Handle_Absolute_Local_Paths)  {
+TEST(URLResolverTest, Handle_Absolute_Local_Paths) {
     std::filesystem::path fake_base = "/var/www";
-    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"), 
-        "file:///var/www/images/foo.jpg");
+    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"),
+              "file:///var/www/images/foo.jpg");
 }
 
-TEST(URLResolverTest, Handle_Relative_Local_Paths)  {
+TEST(URLResolverTest, Handle_Relative_Local_Paths) {
     std::filesystem::path fake_base = "/var/www";
 
     // test subdirectory
-    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"), 
-        "file:///var/www/images/foo.jpg");
+    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"),
+              "file:///var/www/images/foo.jpg");
 
     // test same directory
-    EXPECT_EQ(get_full_url(fake_base, "bar.gif"), 
-        "file:///var/www/bar.gif");
+    EXPECT_EQ(get_full_url(fake_base, "bar.gif"), "file:///var/www/bar.gif");
 }
 
-TEST(URLResolverTest, Trailing_Slash_On_Base_Path)  {
+TEST(URLResolverTest, Trailing_Slash_On_Base_Path) {
     std::filesystem::path fake_base = "/var/www/";
-    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"), 
-        "file:///var/www/images/foo.jpg");
+    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"),
+              "file:///var/www/images/foo.jpg");
 }
 
-TEST(URLResolverTest, Empty_URL)    {
+TEST(URLResolverTest, Empty_URL) {
     std::filesystem::path fake_base = "/var/www";
     EXPECT_EQ(get_full_url(fake_base, ""), "file:///var/www/");
 }

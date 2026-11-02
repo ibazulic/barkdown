@@ -16,12 +16,12 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "image_loader.hpp"
+#include "verbosity.hpp"
 #include <algorithm>
 #include <curl/curl.h>
 #include <functional>
 #include <iostream>
 #include <string>
-#include "verbosity.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
@@ -30,7 +30,7 @@ image_loader::image_loader(const std::string &document_path) : stop_(false) {
     if (barkdown_verbose) {
         std::cerr << "Initializing worker pool and setting base path\n";
     }
-    
+
     // set up document base path
     if (!document_path.empty()) {
         std::filesystem::path p(document_path);
@@ -51,7 +51,7 @@ image_loader::image_loader(const std::string &document_path) : stop_(false) {
         if (pwd) {
             std::filesystem::path p(pwd);
             base_path = p;
-        } 
+        }
 #endif
     }
 
@@ -84,7 +84,6 @@ image_loader::~image_loader() {
 
     // clean up all resources
     clear_resources();
-
 }
 
 // get_proxy checks if there are any proxy variables based on prefix so we can
@@ -353,11 +352,11 @@ void image_loader::process_uploads() {
             cache_[url].texture_id = texture_id;
             if (barkdown_verbose) {
                 std::cerr << "Image with source url " << url
-                      << " processed, height: " << cache_[url].height
-                      << ", width: " << cache_[url].width
-                      << ", size: " << raw.size()
-                      << ", state: " << cache_[url].state << "\n";
-            }            
+                          << " processed, height: " << cache_[url].height
+                          << ", width: " << cache_[url].width
+                          << ", size: " << raw.size()
+                          << ", state: " << cache_[url].state << "\n";
+            }
         }
 
         // free buffer
