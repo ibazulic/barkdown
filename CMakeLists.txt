@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project("Barkdown Viewer"
-    VERSION 1.0.0
+    VERSION 0.1.0
     LANGUAGES CXX
 )
 
@@ -196,7 +196,7 @@ install(TARGETS barkdown DESTINATION bin)
 
 # package metadata
 set(CPACK_PACKAGE_NAME "barkdown")
-set(CPACK_PACKAGE_VERSION "0.1.0")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Ivan Bazulic <ibazulic@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A fast, multithreaded, GPU-accelerated Markdown viewer")
 
