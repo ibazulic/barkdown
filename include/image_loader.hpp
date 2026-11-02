@@ -22,6 +22,7 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <GL/gl.h>
 #endif
 #include <condition_variable>
+#include <curl/curl.h>
 #include <filesystem>
 #include <mutex>
 #include <optional>
@@ -30,7 +31,6 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <curl/curl.h>
 
 // image_state is an enum containing the current state of the image.
 enum image_state {
@@ -127,8 +127,10 @@ std::string get_proxy(std::string prefix);
 std::string get_full_url(const std::filesystem::path base_path,
                          const std::string &url);
 
-// global_curl_context class is a wrapper around global curl initialization context that needs to run once. Since
-// we're using threaded operations to download images, it has to be initialized before any threading operations commence.
+// global_curl_context class is a wrapper around global curl initialization
+// context that needs to run once. Since we're using threaded operations to
+// download images, it has to be initialized before any threading operations
+// commence.
 class global_curl_context {
     public:
         global_curl_context() { curl_global_init(CURL_GLOBAL_DEFAULT); }
@@ -136,6 +138,6 @@ class global_curl_context {
 
         // explicitly forbid copying of context, only one global CURL context
         // can exist
-        global_curl_context(const global_curl_context&) = delete;
-        global_curl_context& operator=(const global_curl_context&) = delete;
+        global_curl_context(const global_curl_context &) = delete;
+        global_curl_context &operator=(const global_curl_context &) = delete;
 };

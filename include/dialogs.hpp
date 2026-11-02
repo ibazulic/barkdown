@@ -16,14 +16,14 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #pragma once
-#include <string>
-#include <imgui.h>
 #include <filesystem>
+#include <imgui.h>
+#include <string>
 #include <vector>
 
 struct dir_entry {
-    std::string name;
-    bool is_directory;
+        std::string name;
+        bool is_directory;
 };
 
 // severity represents the severity of the dialog popup.
@@ -43,25 +43,29 @@ class FileDialog {
         // open opens the file dialog screen and displays it on the screen.
         void open(const std::string &start_path = "");
 
-        // render renders the dialog screen constantly until a file has been chosen.
-        // Returns true when a file is picked for rendering
+        // render renders the dialog screen constantly until a file has been
+        // chosen. Returns true when a file is picked for rendering
         bool render(std::string &out_path);
+
     private:
         bool should_open_ = false;
         std::filesystem::path current_dir_;
         // tracks which file is selected in the dialog screen.
         int selected_index_ = -1;
         std::vector<dir_entry> entries_;
-        // refresh_entries refreshes the entries in the dialog screen after directory change.
+        // refresh_entries refreshes the entries in the dialog screen after
+        // directory change.
         void refresh_entries();
 };
 
-// MessageDialog implements methods and functions needed to display various messages during
-// program execution.
+// MessageDialog implements methods and functions needed to display various
+// messages during program execution.
 class MessageDialog {
     public:
-        void show(const std::string &title, const std::string &message, severity sev);
+        void show(const std::string &title, const std::string &message,
+                  severity sev);
         void render();
+
     private:
         bool should_open_ = false;
         severity sev_ = DIALOG_INFORMATION;

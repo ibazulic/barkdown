@@ -16,6 +16,7 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "markdown.hpp"
+#include "verbosity.hpp"
 #include "window.hpp"
 #include <cmark.h>
 #include <cstdlib>
@@ -23,19 +24,19 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "verbosity.hpp"
 
 void usage() {
     std::cerr << "Usage: barkdown [options] /path/to/markdown.md\n";
     std::cerr << "Options:\n\n";
-    std::cerr << "/path/to/markdown.md: Path to the Markdown file to render.\n"; 
-    std::cerr << "-v, --verbose (optional): Print verbose output on standard error, such as Markdown rendering information.\n\n";
+    std::cerr << "/path/to/markdown.md: Path to the Markdown file to render.\n";
+    std::cerr << "-v, --verbose (optional): Print verbose output on standard "
+                 "error, such as Markdown rendering information.\n\n";
 }
 
 int main(int argc, char *argv[]) {
     if (argc > 3) {
-        std::cerr << "Wrong number of arguments given, expected at most 3, got " << argc
-                  << ".\n";
+        std::cerr << "Wrong number of arguments given, expected at most 3, got "
+                  << argc << ".\n";
         usage();
         std::exit(1);
     }
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     std::string filename;
 
     // start from index 1 since index 0 is the invoked filename
-    for(int i = 1; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         std::string s = argv[i];
         if (s == "-v" || s == "--verbose") {
             barkdown_verbose = true;
@@ -71,4 +72,3 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 }
-

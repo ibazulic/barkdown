@@ -39,4 +39,3 @@ enum icon {
 // filename of the file for rendering if provided.
 enum errorcodes main_window(const char *window_title, int height, int width,
                             std::string filename);
-

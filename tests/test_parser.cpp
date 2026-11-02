@@ -15,9 +15,9 @@ You should have received a copy of the GNU General Public License
 along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
 #include "markdown.hpp"
 #include <fstream>
+#include <gtest/gtest.h>
 #include <sstream>
 
 TEST(Parser, Simple_Heading) {
@@ -36,8 +36,8 @@ TEST(Parser, Parse_All_Headings) {
 ##### Heading 5
 ###### Heading 6)";
 
-    node_type expected_types[] = {HEADING_1, HEADING_2, HEADING_3, HEADING_4, 
-        HEADING_5, HEADING_6};
+    node_type expected_types[] = {HEADING_1, HEADING_2, HEADING_3,
+                                  HEADING_4, HEADING_5, HEADING_6};
 
     auto result = parse_document(input.c_str(), input.length());
     ASSERT_FALSE(result.empty());
@@ -67,7 +67,8 @@ code block
     auto result = parse_document(input.c_str(), input.length());
     ASSERT_FALSE(result.empty());
     for (long unsigned int i = 0; i < result.size(); i++) {
-        std::cout << i << ": type=" << result[i].type << " text='" << result[i].textblock << "'" << std::endl;
+        std::cout << i << ": type=" << result[i].type << " text='"
+                  << result[i].textblock << "'" << std::endl;
     }
     ASSERT_EQ(result.size(), 2);
     ASSERT_EQ(result[0].textblock, "This is a multi line");
@@ -82,7 +83,8 @@ TEST(Parser, Parse_Bold_Text) {
     auto result = parse_document(input.c_str(), input.length());
     ASSERT_FALSE(result.empty());
     for (long unsigned int i = 0; i < result.size(); i++) {
-        std::cout << i << ": type=" << result[i].type << " text='" << result[i].textblock << "'" << std::endl;
+        std::cout << i << ": type=" << result[i].type << " text='"
+                  << result[i].textblock << "'" << std::endl;
     }
     ASSERT_EQ(result.size(), 3);
     ASSERT_EQ(result[0].textblock, "This is ");
@@ -97,7 +99,8 @@ TEST(Parser, Parse_Emphasized_Text) {
     auto result = parse_document(input.c_str(), input.length());
     ASSERT_FALSE(result.empty());
     for (long unsigned int i = 0; i < result.size(); i++) {
-        std::cout << i << ": type=" << result[i].type << " text='" << result[i].textblock << "'" << std::endl;
+        std::cout << i << ": type=" << result[i].type << " text='"
+                  << result[i].textblock << "'" << std::endl;
     }
     ASSERT_EQ(result.size(), 3);
     ASSERT_EQ(result[0].textblock, "This is ");
@@ -112,7 +115,8 @@ TEST(Parser, Parse_Bold_And_Italic_Text) {
     auto result = parse_document(input.c_str(), input.length());
     ASSERT_FALSE(result.empty());
     for (long unsigned int i = 0; i < result.size(); i++) {
-        std::cout << i << ": type=" << result[i].type << " text='" << result[i].textblock << "'" << std::endl;
+        std::cout << i << ": type=" << result[i].type << " text='"
+                  << result[i].textblock << "'" << std::endl;
     }
     ASSERT_EQ(result.size(), 3);
     ASSERT_EQ(result[0].textblock, "This is ");
@@ -141,9 +145,11 @@ TEST(Parser, Parse_Unordered_List) {
 - item 2
 - item 3)";
 
-    node_type expected_types[] = {TEXT, LIST_ITEM_UNORDERED, TEXT, LIST_ITEM_UNORDERED, 
+    node_type expected_types[] = {
+        TEXT, LIST_ITEM_UNORDERED, TEXT, LIST_ITEM_UNORDERED,
         TEXT, LIST_ITEM_UNORDERED, TEXT};
-    std::string expected_strings[] = {" ", " ", "item 1", " ", "item 2", " ", "item 3"};
+    std::string expected_strings[] = {" ",      " ", "item 1", " ",
+                                      "item 2", " ", "item 3"};
 
     auto result = parse_document(input.c_str(), input.length());
     ASSERT_FALSE(result.empty());
@@ -155,7 +161,8 @@ TEST(Parser, Parse_Unordered_List) {
     for (long unsigned int i = 1; i < result.size(); i++) {
         ASSERT_EQ(result[i].type, expected_types[i]);
         if (result[i].type == TEXT) {
-            std::cout << i << ": type" << result[i].type << " text='" << result[i].textblock << "'" << std::endl;
+            std::cout << i << ": type" << result[i].type << " text='"
+                      << result[i].textblock << "'" << std::endl;
             ASSERT_EQ(result[i].textblock, expected_strings[i]);
         }
     }
@@ -173,14 +180,18 @@ TEST(Parser, Parse_Nested_Unordered_Lists) {
     ASSERT_FALSE(result.empty());
     ASSERT_EQ(result.size(), 12);
 
-    for (long unsigned int i = 0; i < result.size(); i++)   {
-        if(result[i].textblock.empty()) continue;
-        if (result[i].textblock == "item 1" || result[i].textblock == "item 2" || 
-            result[i].textblock == "item 3" || result[i].textblock == "item 4") {
-                ASSERT_EQ(result[i].depth, 4);
-            }
-        if (result[i].textblock == "item a" || result[i].textblock == "item b") {
-                ASSERT_EQ(result[i].depth, 8);
+    for (long unsigned int i = 0; i < result.size(); i++) {
+        if (result[i].textblock.empty())
+            continue;
+        if (result[i].textblock == "item 1" ||
+            result[i].textblock == "item 2" ||
+            result[i].textblock == "item 3" ||
+            result[i].textblock == "item 4") {
+            ASSERT_EQ(result[i].depth, 4);
+        }
+        if (result[i].textblock == "item a" ||
+            result[i].textblock == "item b") {
+            ASSERT_EQ(result[i].depth, 8);
         }
     }
 }
@@ -190,8 +201,9 @@ TEST(Parser, Parse_Ordered_List) {
 2. item 2
 3. item 3)";
 
-    node_type expected_types[] = {LIST_ITEM_ORDERED, TEXT, LIST_ITEM_ORDERED, 
-            TEXT, LIST_ITEM_ORDERED, TEXT};
+    node_type expected_types[] = {LIST_ITEM_ORDERED, TEXT,
+                                  LIST_ITEM_ORDERED, TEXT,
+                                  LIST_ITEM_ORDERED, TEXT};
 
     int item_counter = 0;
     int string_counter = 0;
@@ -221,8 +233,10 @@ TEST(Parser, Parse_Nested_Ordered_List) {
     2. sub item b
 3. item 3)";
 
-    node_type expected_types[] = {TEXT, LIST_ITEM_ORDERED, TEXT, LIST_ITEM_ORDERED, TEXT, LIST_ITEM_ORDERED, TEXT, 
-        LIST_ITEM_ORDERED, TEXT, LIST_ITEM_ORDERED, TEXT};
+    node_type expected_types[] = {
+        TEXT, LIST_ITEM_ORDERED, TEXT, LIST_ITEM_ORDERED,
+        TEXT, LIST_ITEM_ORDERED, TEXT, LIST_ITEM_ORDERED,
+        TEXT, LIST_ITEM_ORDERED, TEXT};
 
     int main_list_counter = 0;
     int sub_list_counter = 0;
@@ -233,7 +247,9 @@ TEST(Parser, Parse_Nested_Ordered_List) {
 
     for (long unsigned int i = 0; i < result.size(); i++) {
         ASSERT_EQ(result[i].type, expected_types[i]);
-        if ((result[i].textblock == "item 1") || (result[i].textblock == "item 2") || (result[i].textblock == "item 3")) {
+        if ((result[i].textblock == "item 1") ||
+            (result[i].textblock == "item 2") ||
+            (result[i].textblock == "item 3")) {
             ASSERT_EQ(result[i].depth, 4);
         }
         if ((result[i].type == LIST_ITEM_ORDERED) && (result[i].depth == 4)) {
@@ -241,14 +257,15 @@ TEST(Parser, Parse_Nested_Ordered_List) {
             ASSERT_EQ(result[i].ordered_item_number, main_list_counter);
         }
 
-        if ((result[i].textblock == "sub item a") || (result[i].textblock == "sub item b")) {
+        if ((result[i].textblock == "sub item a") ||
+            (result[i].textblock == "sub item b")) {
             ASSERT_EQ(result[i].depth, 8);
         }
 
         if ((result[i].type == LIST_ITEM_ORDERED) && (result[i].depth == 8)) {
             sub_list_counter++;
             ASSERT_EQ(result[i].ordered_item_number, sub_list_counter);
-        }  
+        }
     }
 }
 
@@ -294,12 +311,12 @@ ___
 
 4th string)";
     auto result = parse_document(input.c_str(), input.length());
-    
+
     ASSERT_FALSE(result.empty());
     ASSERT_EQ(result.size(), 7);
 
     for (long unsigned int i = 0; i < result.size(); i++) {
-        if(result[i].textblock.empty()) {
+        if (result[i].textblock.empty()) {
             ASSERT_EQ(result[i].type, HORIZONTAL_RULE);
         }
         if (!result[i].textblock.empty()) {
@@ -312,7 +329,8 @@ TEST(Parser, Parse_HTML_Code_Inline) {
     std::string input = "This is <h1>HTML PARSING!</h1>.";
     auto result = parse_document(input.c_str(), input.length());
 
-    std::string expected_strings[] = {"This is ", "<h1>", "HTML PARSING!", "</h1>", "."};
+    std::string expected_strings[] = {"This is ", "<h1>", "HTML PARSING!",
+                                      "</h1>", "."};
 
     ASSERT_FALSE(result.empty());
     ASSERT_EQ(result.size(), 5);
@@ -325,7 +343,7 @@ TEST(Parser, Parse_HTML_Code_Inline) {
             ASSERT_EQ(result[i].type, INLINE_HTML);
             ASSERT_EQ(result[i].is_inline, true);
         }
-    } 
+    }
 }
 
 TEST(Parser, Parse_HTML_Code_Block) {
@@ -337,7 +355,8 @@ Some text here
 
 Some more text)";
 
-    std::string expected_strings[] = {"HTML block:", "<div>", "Some text here", "</div>", "Some more text"};
+    std::string expected_strings[] = {"HTML block:", "<div>", "Some text here",
+                                      "</div>", "Some more text"};
 
     auto result = parse_document(input.c_str(), input.length());
 
@@ -345,7 +364,8 @@ Some more text)";
 
     for (unsigned long int i = 0; i < result.size(); i++) {
         if (!result[i].textblock.empty()) {
-            std::cout << "Iteration: " << i + 1 << ", text: " << result[i].textblock << std::endl;
+            std::cout << "Iteration: " << i + 1
+                      << ", text: " << result[i].textblock << std::endl;
         }
     }
 
@@ -358,7 +378,8 @@ Some more text)";
         if (result[i].textblock == "<div>" || result[i].textblock == "</div>") {
             ASSERT_EQ(result[i].type, HTML_BLOCK);
         }
-        if (result[i].textblock == "<div>" || result[i].textblock == "</div>" || result[i].textblock == "Some text here") {
+        if (result[i].textblock == "<div>" || result[i].textblock == "</div>" ||
+            result[i].textblock == "Some text here") {
             ASSERT_EQ(result[i].depth, 4);
         } else {
             ASSERT_EQ(result[i].depth, 0);
