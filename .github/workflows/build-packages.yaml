@@ -143,12 +143,12 @@ jobs:
         name: barkdown-rpm
         path: packages
     - name: Create release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: packages/*
-        draft: false
-        prerelease: false
-        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+        TAG: ${{ github.ref_name }}
+      run: |
+        gh release create "$TAG" packages/* --draft --generate-notes --verify-tag
+        gh release edit "$TAG" --draft=false
+
 
