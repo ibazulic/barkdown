@@ -10,6 +10,20 @@ on:
     - main
   workflow_dispatch:
 jobs:
+  format-check:
+    name: Linting check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pre-commit hooks
+        run: pip install pre-commit
+      - name: Run pre-commit hook
+        run: pre-commit run --all-files --show-diff-on-failure
   build-deb:
     name: Build deb package
     runs-on: ubuntu-latest
