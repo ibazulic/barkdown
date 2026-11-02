@@ -26,37 +26,9 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <stb/stb_image.h>
 
 // image_loader constructor creates the thread pool on class instantiation.
-image_loader::image_loader(const std::string &document_path) : stop_(false) {
+image_loader::image_loader() : stop_(false) {
     if (barkdown_verbose) {
-        std::cerr << "Initializing worker pool and setting base path\n";
-    }
-
-    // set up document base path
-    if (!document_path.empty()) {
-        std::filesystem::path p(document_path);
-
-        // need to convert to absolute path
-        base_path = std::filesystem::absolute(p).parent_path();
-    } else {
-// set the base path to the home directory of the current user
-#if defined(_WIN32)
-        const char *home = std::getenv("USERPROFILE");
-        if (home) {
-            std::filesystem::path p(home);
-            base_path = p;
-        }
-#else
-        // set path to current working directory
-        const char *pwd = std::getenv("PWD");
-        if (pwd) {
-            std::filesystem::path p(pwd);
-            base_path = p;
-        }
-#endif
-    }
-
-    if (barkdown_verbose) {
-        std::cerr << "Base path set to: " << base_path << "\n";
+        std::cerr << "Initializing worker pool...\n";
     }
 
     for (int i = 0; i < 4; i++) {
@@ -107,30 +79,33 @@ std::string get_proxy(std::string prefix) {
 }
 
 // get_full_url returns a full url to the caller along with its prefix.
-std::string get_full_url(const std::filesystem::path base_path,
+std::string get_full_url(const std::filesystem::path &base_path,
                          const std::string &url) {
+    // if url is an exact http/https/file URL, return it
+    if (url.starts_with("https://") || url.starts_with("http://") ||
+        url.starts_with("file://")) {
+        return url;
+    }
+
+    std::filesystem::path full_path(url);
     std::string full_url;
 
-    // convert base path to string
-
-    std::string path = base_path.string();
-
-    // check if the base path has a trailing slash, if it does, pop it
-    if (path.ends_with("/")) {
-        path.pop_back();
+    // if there is no base path set, calculate absolute path from the
+    // url and set it as the end path
+    if (full_path.is_relative() && !base_path.empty()) {
+        full_path = base_path / full_path;
     }
 
-    // assume that file is local if there's no prefix in front
-    if (!url.starts_with("http") && (!url.starts_with("file"))) {
-        // if the url starts with a slash, treat it like a full path
-        if (url.starts_with("/")) {
-            full_url = "file://" + url;
-        } else {
-            full_url = "file://" + path + "/" + url;
-        }
-    } else {
-        full_url = url;
+    // make it absolute in one place
+    std::error_code ec;
+    std::filesystem::path abs_path = std::filesystem::absolute(full_path, ec);
+    if (ec) {
+        // this should only happen for an empty path
+        abs_path = std::filesystem::current_path();
     }
+
+    full_url = "file://" + abs_path.lexically_normal().string();
+
     return full_url;
 }
 

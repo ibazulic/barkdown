@@ -34,9 +34,30 @@ TEST(URLResolverTest, Handle_Explicit_File_URLs) {
 }
 
 TEST(URLResolverTest, Handle_Absolute_Local_Paths) {
-    std::filesystem::path fake_base = "/var/www";
-    EXPECT_EQ(get_full_url(fake_base, "images/foo.jpg"),
+    std::filesystem::path fake_base = "/some/path";
+    EXPECT_EQ(get_full_url(fake_base, "/var/www/images/foo.jpg"),
               "file:///var/www/images/foo.jpg");
+}
+
+TEST(URLResolverTest, Empty_Base_Path) {
+    std::filesystem::path fake_base = "";
+    EXPECT_EQ(get_full_url(fake_base, "/var/www/images/foo.jpg"),
+              "file:///var/www/images/foo.jpg");
+}
+
+TEST(URLResolverTest, Empty_Base_Path_With_Relative_Path) {
+    std::filesystem::path fake_base = "";
+    EXPECT_EQ(
+        get_full_url(fake_base, "images/foo.jpg"),
+        "file://" +
+            (std::filesystem::current_path() / "images/foo.jpg").string());
+}
+
+TEST(URLResolverTest, All_Paths_Empty) {
+    std::filesystem::path fake_base = "";
+    EXPECT_NO_THROW(get_full_url(fake_base, ""));
+    EXPECT_EQ(get_full_url(fake_base, ""),
+              "file://" + std::filesystem::current_path().string());
 }
 
 TEST(URLResolverTest, Handle_Relative_Local_Paths) {
@@ -59,4 +80,27 @@ TEST(URLResolverTest, Trailing_Slash_On_Base_Path) {
 TEST(URLResolverTest, Empty_URL) {
     std::filesystem::path fake_base = "/var/www";
     EXPECT_EQ(get_full_url(fake_base, ""), "file:///var/www/");
+}
+
+TEST(URLResolverTest, File_Containing_File_In_Name) {
+    std::filesystem::path fake_base = "/var/www";
+    EXPECT_EQ(get_full_url(fake_base, "file_icon.png"),
+              "file:///var/www/file_icon.png");
+}
+
+TEST(URLResolverTest, File_Containing_http_In_Name) {
+    std::filesystem::path fake_base = "/var/www";
+    EXPECT_EQ(get_full_url(fake_base, "http_header.jpg"),
+              "file:///var/www/http_header.jpg");
+}
+
+TEST(URLResolverTest, File_Containing_http_In_Name_But_Is_Remote) {
+    std::filesystem::path fake_base = "/home/user";
+    EXPECT_EQ(get_full_url(fake_base, "https://foo.bar/http_header.jpg"),
+              "https://foo.bar/http_header.jpg");
+}
+
+TEST(URLResolverTest, Parent_Directory) {
+    std::filesystem::path fake_base = "/var/www";
+    EXPECT_EQ(get_full_url(fake_base, "../img/a.png"), "file:///var/img/a.png");
 }
