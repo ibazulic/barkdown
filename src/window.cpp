@@ -188,7 +188,7 @@ errorcodes main_window(const char *window_title, int height, int width,
     }
 
     // initialize image loader
-    image_loader loader(filename);
+    image_loader loader;
 
     // get actual window size
     int actual_width, actual_height;

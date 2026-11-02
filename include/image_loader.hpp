@@ -63,7 +63,7 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *clientptr);
 class image_loader {
     public:
         // Constructor that initializes the thread pool
-        image_loader(const std::string &document_path);
+        image_loader();
 
         // Class destructor that joins all threads and closes the pool safely
         ~image_loader();
@@ -124,7 +124,7 @@ class image_loader {
 std::string get_proxy(std::string prefix);
 
 // get_full_url returns the full url to the object including its prefix
-std::string get_full_url(const std::filesystem::path base_path,
+std::string get_full_url(const std::filesystem::path &base_path,
                          const std::string &url);
 
 // global_curl_context class is a wrapper around global curl initialization
