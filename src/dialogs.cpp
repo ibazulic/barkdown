@@ -206,41 +206,43 @@ void MessageDialog::render() {
         ImGui::Dummy(ImVec2(2.5f * r, 2.5f * r));
 
         switch (sev_) {
-        case DIALOG_ERROR: {
-            // adds circle to the center
-            dl->AddCircleFilled(ImVec2(p.x + r, p.y + r), r,
-                                IM_COL32(200, 40, 40, 255));
-            // add lines
-            float k = r * 0.45f;
-            dl->AddLine(ImVec2(p.x + r - k, p.y + r - k),
-                        ImVec2(p.x + r + k, p.y + r + k),
-                        IM_COL32(255, 255, 255, 255), 2.0f);
-            dl->AddLine(ImVec2(p.x + r - k, p.y + r + k),
-                        ImVec2(p.x + r + k, p.y + r - k),
-                        IM_COL32(255, 255, 255, 255), 2.0f);
-            break;
-        }
-        case DIALOG_WARNING:
-            dl->AddTriangleFilled(
-                ImVec2(p.x + r, p.y), ImVec2(p.x, p.y + 2 * r),
-                ImVec2(p.x + 2 * r, p.y + 2 * r), IM_COL32(240, 180, 0, 255));
-            dl->AddLine(ImVec2(p.x + r, p.y + 0.8f * r),
-                        ImVec2(p.x + r, p.y + 1.4f * r),
-                        IM_COL32(30, 30, 30, 255), 2.0f);
-            dl->AddCircleFilled(ImVec2(p.x + r, p.y + 1.7f * r), r / 10,
-                                IM_COL32(30, 30, 30, 255));
-            break;
-        case DIALOG_INFORMATION:
-            dl->AddCircleFilled(ImVec2(p.x + r, p.y + r), r,
-                                IM_COL32(0, 0, 255, 255));
-            dl->AddCircleFilled(ImVec2(p.x + r, p.y + 0.55f * r), r / 10,
-                                IM_COL32(255, 255, 255, 255));
-            dl->AddLine(ImVec2(p.x + r, p.y + 0.85f * r),
-                        ImVec2(p.x + r, p.y + 1.5f * r),
-                        IM_COL32(255, 255, 255, 255), 2.0f);
-            break;
-        default:
-            break;
+            case DIALOG_ERROR:
+                {
+                    // adds circle to the center
+                    dl->AddCircleFilled(ImVec2(p.x + r, p.y + r), r,
+                                        IM_COL32(200, 40, 40, 255));
+                    // add lines
+                    float k = r * 0.45f;
+                    dl->AddLine(ImVec2(p.x + r - k, p.y + r - k),
+                                ImVec2(p.x + r + k, p.y + r + k),
+                                IM_COL32(255, 255, 255, 255), 2.0f);
+                    dl->AddLine(ImVec2(p.x + r - k, p.y + r + k),
+                                ImVec2(p.x + r + k, p.y + r - k),
+                                IM_COL32(255, 255, 255, 255), 2.0f);
+                    break;
+                }
+            case DIALOG_WARNING:
+                dl->AddTriangleFilled(ImVec2(p.x + r, p.y),
+                                      ImVec2(p.x, p.y + 2 * r),
+                                      ImVec2(p.x + 2 * r, p.y + 2 * r),
+                                      IM_COL32(240, 180, 0, 255));
+                dl->AddLine(ImVec2(p.x + r, p.y + 0.8f * r),
+                            ImVec2(p.x + r, p.y + 1.4f * r),
+                            IM_COL32(30, 30, 30, 255), 2.0f);
+                dl->AddCircleFilled(ImVec2(p.x + r, p.y + 1.7f * r), r / 10,
+                                    IM_COL32(30, 30, 30, 255));
+                break;
+            case DIALOG_INFORMATION:
+                dl->AddCircleFilled(ImVec2(p.x + r, p.y + r), r,
+                                    IM_COL32(0, 0, 255, 255));
+                dl->AddCircleFilled(ImVec2(p.x + r, p.y + 0.55f * r), r / 10,
+                                    IM_COL32(255, 255, 255, 255));
+                dl->AddLine(ImVec2(p.x + r, p.y + 0.85f * r),
+                            ImVec2(p.x + r, p.y + 1.5f * r),
+                            IM_COL32(255, 255, 255, 255), 2.0f);
+                break;
+            default:
+                break;
         }
 
         // continue on the same line

@@ -27,16 +27,16 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 // is_block_node returns true if the node we're in is a block node.
 bool is_block_node(cmark_node_type type) {
     switch (type) {
-    // case CMARK_NODE_DOCUMENT:
-    case CMARK_NODE_BLOCK_QUOTE:
-    case CMARK_NODE_LIST:
-    case CMARK_NODE_ITEM:
-    case CMARK_NODE_CUSTOM_BLOCK:
-    case CMARK_NODE_PARAGRAPH:
-    case CMARK_NODE_HEADING:
-        return true;
-    default:
-        return false;
+        // case CMARK_NODE_DOCUMENT:
+        case CMARK_NODE_BLOCK_QUOTE:
+        case CMARK_NODE_LIST:
+        case CMARK_NODE_ITEM:
+        case CMARK_NODE_CUSTOM_BLOCK:
+        case CMARK_NODE_PARAGRAPH:
+        case CMARK_NODE_HEADING:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -44,20 +44,20 @@ bool is_block_node(cmark_node_type type) {
 // caller.
 node_type get_heading_type(int heading_level) {
     switch (heading_level) {
-    case 1:
-        return HEADING_1;
-    case 2:
-        return HEADING_2;
-    case 3:
-        return HEADING_3;
-    case 4:
-        return HEADING_4;
-    case 5:
-        return HEADING_5;
-    case 6:
-        return HEADING_6;
-    default:
-        return HEADING_1;
+        case 1:
+            return HEADING_1;
+        case 2:
+            return HEADING_2;
+        case 3:
+            return HEADING_3;
+        case 4:
+            return HEADING_4;
+        case 5:
+            return HEADING_5;
+        case 6:
+            return HEADING_6;
+        default:
+            return HEADING_1;
     }
 }
 
@@ -131,230 +131,247 @@ std::vector<markdown_node> parse_document(const char *readBuffer,
             cmark_node_type type = cmark_node_get_type(cur_node);
 
             switch (event) {
-            case CMARK_EVENT_ENTER: {
-                if (is_block_node(type)) {
-                    // check if we need to suppress a new line, particularly
-                    // when entering a list block
-                    if (suppress_next_new_line) {
-                        suppress_next_new_line = false;
-                        start_new_line = false;
-                    } else {
-                        start_new_line = true;
-                    }
+                case CMARK_EVENT_ENTER:
+                    {
+                        if (is_block_node(type)) {
+                            // check if we need to suppress a new line,
+                            // particularly when entering a list block
+                            if (suppress_next_new_line) {
+                                suppress_next_new_line = false;
+                                start_new_line = false;
+                            } else {
+                                start_new_line = true;
+                            }
 
-                    if (type == CMARK_NODE_LIST ||
-                        type == CMARK_NODE_BLOCK_QUOTE) {
-                        if (type == CMARK_NODE_LIST) {
-                            item_lists.push_back(1);
+                            if (type == CMARK_NODE_LIST ||
+                                type == CMARK_NODE_BLOCK_QUOTE) {
+                                if (type == CMARK_NODE_LIST) {
+                                    item_lists.push_back(1);
+                                }
+                                depth.push_back(depth.back() + 4);
+                            } else {
+                                depth.push_back(depth.back());
+                            }
                         }
-                        depth.push_back(depth.back() + 4);
-                    } else {
-                        depth.push_back(depth.back());
-                    }
-                }
 
-                switch (type) {
-                case CMARK_NODE_HEADING: {
-                    header_level = cmark_node_get_heading_level(cur_node);
-                    is_currently_header = true;
-                    current_block_type = get_heading_type(header_level);
-                    break;
-                }
-                case CMARK_NODE_EMPH:
-                    is_currently_italic = true;
-                    break;
-                case CMARK_NODE_STRONG:
-                    is_currently_bold = true;
-                    break;
+                        switch (type) {
+                            case CMARK_NODE_HEADING:
+                                {
+                                    header_level =
+                                        cmark_node_get_heading_level(cur_node);
+                                    is_currently_header = true;
+                                    current_block_type =
+                                        get_heading_type(header_level);
+                                    break;
+                                }
+                            case CMARK_NODE_EMPH:
+                                is_currently_italic = true;
+                                break;
+                            case CMARK_NODE_STRONG:
+                                is_currently_bold = true;
+                                break;
 
-                case CMARK_NODE_THEMATIC_BREAK:
-                    current_data.type = HORIZONTAL_RULE;
-                    current_data.starts_new_line = true;
-                    suppress_next_new_line = false;
-                    current_data.is_bold = false;
-                    current_data.is_inline = false;
-                    current_data.is_italic = false;
-                    parsed_document.push_back(current_data);
-                    break;
+                            case CMARK_NODE_THEMATIC_BREAK:
+                                current_data.type = HORIZONTAL_RULE;
+                                current_data.starts_new_line = true;
+                                suppress_next_new_line = false;
+                                current_data.is_bold = false;
+                                current_data.is_inline = false;
+                                current_data.is_italic = false;
+                                parsed_document.push_back(current_data);
+                                break;
 
-                case CMARK_NODE_ITEM: {
-                    cmark_list_type list_type =
-                        cmark_node_get_list_type(cmark_node_parent(cur_node));
-                    if (list_type == CMARK_ORDERED_LIST) {
-                        int cur_list_pos = item_lists.back();
-                        item_lists.pop_back();
-                        current_data.ordered_item_number = cur_list_pos;
-                        current_data.type = LIST_ITEM_ORDERED;
-                        item_lists.push_back(cur_list_pos + 1);
-                    } else {
-                        current_data.type = LIST_ITEM_UNORDERED;
-                    }
+                            case CMARK_NODE_ITEM:
+                                {
+                                    cmark_list_type list_type =
+                                        cmark_node_get_list_type(
+                                            cmark_node_parent(cur_node));
+                                    if (list_type == CMARK_ORDERED_LIST) {
+                                        int cur_list_pos = item_lists.back();
+                                        item_lists.pop_back();
+                                        current_data.ordered_item_number =
+                                            cur_list_pos;
+                                        current_data.type = LIST_ITEM_ORDERED;
+                                        item_lists.push_back(cur_list_pos + 1);
+                                    } else {
+                                        current_data.type = LIST_ITEM_UNORDERED;
+                                    }
 
-                    current_data.is_inline = true;
-                    current_data.depth = depth.back();
-                    current_data.starts_new_line = start_new_line;
-                    suppress_next_new_line = true;
+                                    current_data.is_inline = true;
+                                    current_data.depth = depth.back();
+                                    current_data.starts_new_line =
+                                        start_new_line;
+                                    suppress_next_new_line = true;
 
-                    parsed_document.push_back(current_data);
-                    break;
-                }
+                                    parsed_document.push_back(current_data);
+                                    break;
+                                }
 
-                case CMARK_NODE_PARAGRAPH:
-                    current_block_type = TEXT;
-                    break;
-                case CMARK_NODE_TEXT:
-                case CMARK_NODE_CODE:
-                case CMARK_NODE_HTML_INLINE: {
-                    if (is_inside_image) {
-                        continue;
-                    }
+                            case CMARK_NODE_PARAGRAPH:
+                                current_block_type = TEXT;
+                                break;
+                            case CMARK_NODE_TEXT:
+                            case CMARK_NODE_CODE:
+                            case CMARK_NODE_HTML_INLINE:
+                                {
+                                    if (is_inside_image) {
+                                        continue;
+                                    }
 
-                    const char *cur_node_value =
-                        cmark_node_get_literal(cur_node);
+                                    const char *cur_node_value =
+                                        cmark_node_get_literal(cur_node);
 
-                    // check that we don't manipulate an empty string
-                    if (!cur_node_value)
+                                    // check that we don't manipulate an empty
+                                    // string
+                                    if (!cur_node_value)
+                                        break;
+
+                                    std::string input_string = cur_node_value;
+
+                                    // check exactly which node type ths is
+                                    if (type == CMARK_NODE_CODE) {
+                                        current_data.type = INLINE_CODE;
+                                    } else if (type == CMARK_NODE_HTML_INLINE) {
+                                        current_data.type = INLINE_HTML;
+                                    } else {
+                                        current_data.type = current_block_type;
+                                    }
+
+                                    if (!current_link_url.empty()) {
+                                        current_data.type = LINK;
+                                        current_data.url = current_link_url;
+                                    }
+
+                                    // this is always true for inline elements
+                                    current_data.is_inline = true;
+
+                                    // checks if we need to apply specific
+                                    // formatting
+                                    current_data.is_bold = is_currently_bold;
+                                    current_data.is_italic =
+                                        is_currently_italic;
+
+                                    current_data.depth = depth.back();
+                                    current_data.starts_new_line =
+                                        start_new_line;
+                                    start_new_line = false;
+
+                                    parse_and_store(cur_node_value,
+                                                    current_data,
+                                                    parsed_document);
+                                    break;
+                                }
+
+                            case CMARK_NODE_HTML_BLOCK:
+                            case CMARK_NODE_CODE_BLOCK:
+                                {
+                                    const char *cur_node_value =
+                                        cmark_node_get_literal(cur_node);
+
+                                    if (type == CMARK_NODE_HTML_BLOCK) {
+                                        current_data.type = HTML_BLOCK;
+                                    } else
+                                        current_data.type = CODE_BLOCK;
+
+                                    // check that the string is not empty
+                                    if (!cur_node_value)
+                                        break;
+
+                                    // handle indentation
+                                    int indentation = depth.back();
+                                    if (indentation == 0)
+                                        indentation += 4;
+
+                                    current_data.is_inline = false;
+                                    current_data.depth = indentation;
+                                    current_data.starts_new_line = true;
+
+                                    parse_and_store(cur_node_value,
+                                                    current_data,
+                                                    parsed_document);
+                                    break;
+                                }
+
+                            case CMARK_NODE_LINEBREAK:
+                                current_data.type = LINEBREAK;
+                                current_data.textblock = "";
+                                current_data.is_inline = true;
+
+                                current_data.depth = depth.back();
+                                current_data.is_bold = is_currently_bold;
+                                current_data.is_italic = is_currently_italic;
+                                current_data.starts_new_line = start_new_line;
+                                start_new_line = false;
+
+                                parsed_document.push_back(current_data);
+                                break;
+                            case CMARK_NODE_SOFTBREAK:
+                                current_data.type = SOFTBREAK;
+                                current_data.textblock = " ";
+                                current_data.is_inline = true;
+
+                                current_data.depth = depth.back();
+                                current_data.is_bold = is_currently_bold;
+                                current_data.is_italic = is_currently_italic;
+                                current_data.starts_new_line = start_new_line;
+                                start_new_line = false;
+
+                                parsed_document.push_back(current_data);
+                                break;
+                            case CMARK_NODE_LINK:
+                                current_link_url = cmark_node_get_url(cur_node);
+                                break;
+                            case CMARK_NODE_IMAGE:
+                                current_data.type = IMAGE;
+                                current_data.url = cmark_node_get_url(cur_node);
+                                current_data.is_inline = true;
+                                current_data.depth = depth.back();
+
+                                current_data.starts_new_line = start_new_line;
+                                start_new_line = false;
+                                is_inside_image = true;
+
+                                parsed_document.push_back(current_data);
+                                break;
+                            default:
+                                break;
+                        }
                         break;
-
-                    std::string input_string = cur_node_value;
-
-                    // check exactly which node type ths is
-                    if (type == CMARK_NODE_CODE) {
-                        current_data.type = INLINE_CODE;
-                    } else if (type == CMARK_NODE_HTML_INLINE) {
-                        current_data.type = INLINE_HTML;
-                    } else {
-                        current_data.type = current_block_type;
                     }
-
-                    if (!current_link_url.empty()) {
-                        current_data.type = LINK;
-                        current_data.url = current_link_url;
+                case CMARK_EVENT_EXIT:
+                    {
+                        if (is_block_node(type)) {
+                            if (!depth.empty()) {
+                                depth.pop_back();
+                            }
+                        }
+                        switch (type) {
+                            case CMARK_NODE_LIST:
+                                if (!item_lists.empty()) {
+                                    item_lists.pop_back();
+                                }
+                                break;
+                            case CMARK_NODE_HEADING:
+                                is_currently_header = false;
+                                break;
+                            case CMARK_NODE_EMPH:
+                                is_currently_italic = false;
+                                break;
+                            case CMARK_NODE_STRONG:
+                                is_currently_bold = false;
+                                break;
+                            case CMARK_NODE_LINK:
+                                current_link_url = "";
+                                break;
+                            case CMARK_NODE_IMAGE:
+                                is_inside_image = false;
+                                break;
+                            default:
+                                break;
+                        }
                     }
-
-                    // this is always true for inline elements
-                    current_data.is_inline = true;
-
-                    // checks if we need to apply specific formatting
-                    current_data.is_bold = is_currently_bold;
-                    current_data.is_italic = is_currently_italic;
-
-                    current_data.depth = depth.back();
-                    current_data.starts_new_line = start_new_line;
-                    start_new_line = false;
-
-                    parse_and_store(cur_node_value, current_data,
-                                    parsed_document);
-                    break;
-                }
-
-                case CMARK_NODE_HTML_BLOCK:
-                case CMARK_NODE_CODE_BLOCK: {
-                    const char *cur_node_value =
-                        cmark_node_get_literal(cur_node);
-
-                    if (type == CMARK_NODE_HTML_BLOCK) {
-                        current_data.type = HTML_BLOCK;
-                    } else
-                        current_data.type = CODE_BLOCK;
-
-                    // check that the string is not empty
-                    if (!cur_node_value)
-                        break;
-
-                    // handle indentation
-                    int indentation = depth.back();
-                    if (indentation == 0)
-                        indentation += 4;
-
-                    current_data.is_inline = false;
-                    current_data.depth = indentation;
-                    current_data.starts_new_line = true;
-
-                    parse_and_store(cur_node_value, current_data,
-                                    parsed_document);
-                    break;
-                }
-
-                case CMARK_NODE_LINEBREAK:
-                    current_data.type = LINEBREAK;
-                    current_data.textblock = "";
-                    current_data.is_inline = true;
-
-                    current_data.depth = depth.back();
-                    current_data.is_bold = is_currently_bold;
-                    current_data.is_italic = is_currently_italic;
-                    current_data.starts_new_line = start_new_line;
-                    start_new_line = false;
-
-                    parsed_document.push_back(current_data);
-                    break;
-                case CMARK_NODE_SOFTBREAK:
-                    current_data.type = SOFTBREAK;
-                    current_data.textblock = " ";
-                    current_data.is_inline = true;
-
-                    current_data.depth = depth.back();
-                    current_data.is_bold = is_currently_bold;
-                    current_data.is_italic = is_currently_italic;
-                    current_data.starts_new_line = start_new_line;
-                    start_new_line = false;
-
-                    parsed_document.push_back(current_data);
-                    break;
-                case CMARK_NODE_LINK:
-                    current_link_url = cmark_node_get_url(cur_node);
-                    break;
-                case CMARK_NODE_IMAGE:
-                    current_data.type = IMAGE;
-                    current_data.url = cmark_node_get_url(cur_node);
-                    current_data.is_inline = true;
-                    current_data.depth = depth.back();
-
-                    current_data.starts_new_line = start_new_line;
-                    start_new_line = false;
-                    is_inside_image = true;
-
-                    parsed_document.push_back(current_data);
-                    break;
                 default:
                     break;
-                }
-                break;
-            }
-            case CMARK_EVENT_EXIT: {
-                if (is_block_node(type)) {
-                    if (!depth.empty()) {
-                        depth.pop_back();
-                    }
-                }
-                switch (type) {
-                case CMARK_NODE_LIST:
-                    if (!item_lists.empty()) {
-                        item_lists.pop_back();
-                    }
-                    break;
-                case CMARK_NODE_HEADING:
-                    is_currently_header = false;
-                    break;
-                case CMARK_NODE_EMPH:
-                    is_currently_italic = false;
-                    break;
-                case CMARK_NODE_STRONG:
-                    is_currently_bold = false;
-                    break;
-                case CMARK_NODE_LINK:
-                    current_link_url = "";
-                    break;
-                case CMARK_NODE_IMAGE:
-                    is_inside_image = false;
-                    break;
-                default:
-                    break;
-                }
-            }
-            default:
-                break;
             }
         }
         cmark_iter_free(iter);
