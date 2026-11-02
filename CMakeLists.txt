@@ -87,6 +87,7 @@ target_sources(barkdown
         src/file_operations.cpp
         src/image_loader.cpp
         src/verbosity.cpp
+        src/dialogs.cpp
         third_party/imgui/backends/imgui_impl_opengl3.cpp
         third_party/imgui/backends/imgui_impl_sdl2.cpp
         third_party/imgui/imgui.cpp
@@ -144,7 +145,6 @@ target_include_directories(barkdown
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui/backends
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/portable-file-dialogs
 )
 
 # include directories
