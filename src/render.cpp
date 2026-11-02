@@ -42,20 +42,20 @@ enum FontStyle resolve_font(const markdown_node &current_node) {
 // type nodes.
 float get_heading_scale(const markdown_node &current_node) {
     switch (current_node.type) {
-    case HEADING_1:
-        return 2.0f;
-    case HEADING_2:
-        return 1.7f;
-    case HEADING_3:
-        return 1.4f;
-    case HEADING_4:
-        return 1.2f;
-    case HEADING_5:
-        return 1.0f;
-    case HEADING_6:
-        return 0.85f;
-    default:
-        return 1.0f;
+        case HEADING_1:
+            return 2.0f;
+        case HEADING_2:
+            return 1.7f;
+        case HEADING_3:
+            return 1.4f;
+        case HEADING_4:
+            return 1.2f;
+        case HEADING_5:
+            return 1.0f;
+        case HEADING_6:
+            return 0.85f;
+        default:
+            return 1.0f;
     }
 }
 
@@ -181,21 +181,21 @@ void render_document(const std::vector<markdown_node> &parsed,
 
         // find which font we need to use for a specific segment
         switch (resolve_font(parsed[i])) {
-        case Code:
-            font_segment = fontMono;
-            break;
-        case BoldItalic:
-            font_segment = fontBoldItalic;
-            break;
-        case Bold:
-            font_segment = fontBold;
-            break;
-        case Italic:
-            font_segment = fontItalic;
-            break;
-        case Regular:
-        default:
-            font_segment = fontRegular;
+            case Code:
+                font_segment = fontMono;
+                break;
+            case BoldItalic:
+                font_segment = fontBoldItalic;
+                break;
+            case Bold:
+                font_segment = fontBold;
+                break;
+            case Italic:
+                font_segment = fontItalic;
+                break;
+            case Regular:
+            default:
+                font_segment = fontRegular;
         }
 
         // if we need to go on the new line, advance forward and reset cursor to

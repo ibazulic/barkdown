@@ -62,13 +62,13 @@ int main(int argc, char *argv[]) {
     enum errorcodes state =
         main_window("Barkdown Renderer", 720, 1280, filename);
     switch (state) {
-    case SUCCESSFUL_EXIT:
-        return 0;
-    case DETERMINE_WINDOW_SIZE_FAILED:
-    case WINDOW_CREATION_FAILED:
-    case RENDERER_CREATION_FAILED:
-    case SDL_INIT_FAILED:
-    case GL_CONTEXT_CREATE_FAILED:
-        return 1;
+        case SUCCESSFUL_EXIT:
+            return 0;
+        case DETERMINE_WINDOW_SIZE_FAILED:
+        case WINDOW_CREATION_FAILED:
+        case RENDERER_CREATION_FAILED:
+        case SDL_INIT_FAILED:
+        case GL_CONTEXT_CREATE_FAILED:
+            return 1;
     }
 }
