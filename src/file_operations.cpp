@@ -24,8 +24,8 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include <vector>
 
 // ends_with extracts the extension from a file name and converts it to lower
-// letters and compares it with the proper suffix. Returns true extensions
-// match.
+// letters and compares it with the proper suffix. Returns true if the extension
+// matches the suffix .md.
 bool ends_with(const std::string &filename, const std::string &suffix) {
     if (filename.length() >= suffix.length()) {
         std::string extension =

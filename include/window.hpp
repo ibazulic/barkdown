@@ -40,7 +40,3 @@ enum icon {
 enum errorcodes main_window(const char *window_title, int height, int width,
                             std::string filename);
 
-// create_ok_modal_dialog creates a modal dialog with the OK button. Consumes
-// the icon information and text to render.
-void create_ok_modal_dialog(std::string window_title, std::string msg,
-                            enum icon);

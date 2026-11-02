@@ -30,12 +30,6 @@
         "url": "https://github.com/nothings/stb"
     },
     {
-        "project": "portable-file-dialogs",
-        "format": "C++",
-        "license": "WTFPL",
-        "url": "https://github.com/samhocevar/portable-file-dialogs"
-    },
-    {
         "project": "GoogleTest",
         "format": "C++",
         "license": "BSD 3-Clause",

@@ -21,7 +21,7 @@ along with Barkdown.  If not, see <https://www.gnu.org/licenses/>.
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "markdown.hpp"
-#include "portable-file-dialogs.h"
+#include "dialogs.hpp"
 #include "render.hpp"
 #include "image_loader.hpp"
 #if defined(__APPLE__)
@@ -74,6 +74,13 @@ enum errorcodes main_window(const char *window_title, int height, int width,
 
     // default font scale
     float font_scale = 2.0f;
+
+    // Initialize MessageDialog and FileDialog classes
+    MessageDialog msg_dialog;
+    FileDialog file_dialog;
+
+    // path to load data from
+    std::string out_path;
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) != 0) {
         std::cerr << "Could not initialize SDL subsystem. SDL error: "
@@ -183,25 +190,25 @@ enum errorcodes main_window(const char *window_title, int height, int width,
         case FILE_NOT_FOUND: {
             msg = "Error opening: file not found. Path: \n" +
                   absolute_path.string();
-            create_ok_modal_dialog("Open File", msg, ICON_INFORMATION);
+            msg_dialog.show("File not found", msg, DIALOG_INFORMATION);
             break;
         }
         case FILE_READING_FAILED: {
             msg = "Error opening: error reading file on path: \n" +
                   absolute_path.string();
-            create_ok_modal_dialog("Open File", msg, ICON_STOP);
+            msg_dialog.show("Error opening file", msg, DIALOG_ERROR);
             break;
         }
         case FILE_EMPTY: {
             msg = "Empty file provided on path: \n" + absolute_path.string();
-            create_ok_modal_dialog("Open File", msg, ICON_INFORMATION);
+            msg_dialog.show("Empty file provided", msg, DIALOG_WARNING);
             break;
         }
         case FILE_WRONG_EXTENSION: {
             msg = "Error opening file: wrong extension of provided file on "
                   "path: \n" +
                   absolute_path.string();
-            create_ok_modal_dialog("Open File", msg, ICON_INFORMATION);
+            msg_dialog.show("Wrong extension provided", msg, DIALOG_WARNING);
             break;
         }
         case FILE_READ_SUCCESSFUL:
@@ -209,8 +216,7 @@ enum errorcodes main_window(const char *window_title, int height, int width,
             if (parsed.empty()) {
                 msg = "Encountered an error during parsing of the MarkDown "
                       "document";
-                create_ok_modal_dialog("Error parsing document", msg,
-                                       ICON_STOP);
+                msg_dialog.show("Error parsing file", msg, DIALOG_ERROR);
             }
             break;
         default:
@@ -244,54 +250,7 @@ enum errorcodes main_window(const char *window_title, int height, int width,
         ImGui::SetWindowFontScale(2.0f);
 
         if (ImGui::Button("Open File")) {
-            auto selection = pfd::open_file("Choose MarkDown Document", ".",
-                                            {"Markdown files", "*.md"})
-                                 .result();
-            if (!selection.empty()) {
-                return_value = read_file(selection[0], input_buffer);
-                absolute_path = fs::absolute(selection[0]);
-                switch (return_value) {
-                case FILE_NOT_FOUND: {
-                    msg = "Error opening: file not found. Path: \n" +
-                          absolute_path.string();
-                    create_ok_modal_dialog("Open File", msg, ICON_INFORMATION);
-                    break;
-                }
-                case FILE_READING_FAILED: {
-                    msg = "Error opening: error reading file on path: \n" +
-                          absolute_path.string();
-                    create_ok_modal_dialog("Open File", msg, ICON_STOP);
-                    break;
-                }
-                case FILE_EMPTY: {
-                    msg = "Empty file provided on path: \n" +
-                          absolute_path.string();
-                    create_ok_modal_dialog("Open File", msg, ICON_INFORMATION);
-                    break;
-                }
-                case FILE_WRONG_EXTENSION: {
-                    msg = "Error opening file: wrong extension of provided "
-                          "file on path: "
-                          "\n" +
-                          absolute_path.string();
-                    create_ok_modal_dialog("Open File", msg, ICON_INFORMATION);
-                    break;
-                }
-                case FILE_READ_SUCCESSFUL:
-                    parsed = parse_document(input_buffer.c_str(),
-                                            input_buffer.size());
-                    loader.set_path(absolute_path);
-                    if (parsed.empty()) {
-                        msg = "Encountered an error during parsing of the "
-                              "MarkDown document";
-                        create_ok_modal_dialog("Error parsing document", msg,
-                                               ICON_STOP);
-                    }
-                    break;
-                default:
-                    break;
-                }
-            }
+            file_dialog.open(fs::current_path().string());
         }
 
         ImGui::SameLine();
@@ -337,6 +296,52 @@ enum errorcodes main_window(const char *window_title, int height, int width,
                         actual_width);
 
         ImGui::EndChild();
+        if (file_dialog.render(out_path)) {
+            return_value = read_file(out_path, input_buffer);
+            absolute_path = fs::absolute(out_path);
+
+            switch (return_value) {
+            case FILE_NOT_FOUND: {
+                msg = "Error opening: file not found. Path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("File not found", msg, DIALOG_INFORMATION);
+                break;
+            }
+            case FILE_READING_FAILED: {
+                msg = "Error opening: error reading file on path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("Error opening file", msg, DIALOG_ERROR);
+                break;
+            }
+            case FILE_EMPTY: {
+                msg = "Empty file provided on path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("Empty file provided", msg, DIALOG_WARNING);
+                break;
+            }
+            case FILE_WRONG_EXTENSION: {
+                msg = "Error opening file: wrong extension of provided "
+                      "file on path: \n" +
+                      absolute_path.string();
+                msg_dialog.show("Wrong extension provided", msg,
+                                DIALOG_WARNING);
+                break;
+            }
+            case FILE_READ_SUCCESSFUL:
+                parsed = parse_document(input_buffer.c_str(),
+                                        input_buffer.size());
+                loader.set_path(absolute_path);
+                if (parsed.empty()) {
+                    msg = "Encountered an error during parsing of the "
+                          "MarkDown document";
+                    msg_dialog.show("Error parsing file", msg, DIALOG_ERROR);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        msg_dialog.render();
         ImGui::End();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -359,24 +364,4 @@ enum errorcodes main_window(const char *window_title, int height, int width,
     SDL_DestroyWindow(main_window);
     SDL_Quit();
     return SUCCESSFUL_EXIT;
-}
-
-// create_ok_modal_dialog creates a modal dialog with the OK button. Consumes
-// the icon information and text to render.
-void create_ok_modal_dialog(std::string window_title, std::string msg,
-                            enum icon ICON) {
-    pfd::icon icon = pfd::icon::info;
-
-    if (ICON == ICON_WARNING) {
-        icon = pfd::icon::warning;
-    }
-    if (ICON == ICON_INFORMATION) {
-        icon = pfd::icon::info;
-    }
-
-    if (ICON == ICON_STOP) {
-        icon = pfd::icon::error;
-    }
-
-    pfd::message(window_title, msg, pfd::choice::ok, icon).result();
 }
